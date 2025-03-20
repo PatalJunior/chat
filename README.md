@@ -55,9 +55,9 @@ Each client will:
 
 ## Security Features
 
-✔ **RSA Key Exchange** – Prevents man-in-the-middle attacks.
-✔ **AES-256 Encryption** – Strong symmetric encryption for secure messaging.
-✔ **No Plaintext Transmission** – All communication is encrypted before sending.
+1. ✔ **RSA Key Exchange** – Prevents man-in-the-middle attacks.
+2. ✔ **AES-256 Encryption** – Strong symmetric encryption for secure messaging.
+3. ✔ **No Plaintext Transmission** – All communication is encrypted before sending.
 
 ## Future Enhancements
 
