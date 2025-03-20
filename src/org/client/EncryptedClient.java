@@ -55,6 +55,9 @@ public class EncryptedClient {
 
             // Allow user input to send messages
             while (true) {
+                if (socket.isClosed() || socket.isInputShutdown() || !socket.isConnected() ) {
+                    System.out.println("Connection lost to server, stopping");
+                }
                 System.out.print("Enter message (or type 'exit' to quit): ");
                 String messageToSend = scanner.nextLine();
 
