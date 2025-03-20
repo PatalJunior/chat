@@ -3,35 +3,45 @@ package org.shared;
 import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.Socket;
+import java.util.Base64;
+
 
 public class PacketHandler {
+
     private final Socket socket;
     private final SecretKey secretKey;
-    private final BufferedReader reader;
-    private final PrintWriter writer;
+    private final ObjectOutputStream objectOutputStream;
+    private final ObjectInputStream objectInputStream;
 
     public PacketHandler(Socket socket, SecretKey secretKey) throws IOException {
         this.socket = socket;
         this.secretKey = secretKey;
-        this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        this.writer = new PrintWriter(socket.getOutputStream(), true);
+        this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+        this.objectInputStream = new ObjectInputStream(socket.getInputStream());
     }
 
-    // Send an encrypted message
-    public void sendPacket(String message) {
+    // Send a PacketMessage
+    public void sendPacket(PacketMessage packet) {
         try {
-            String encryptedMessage = AESUtil.encrypt(message, secretKey);
-            writer.println(encryptedMessage);
+            // Encrypt content before sending
+            byte[] encryptedContent = AESUtil.encrypt(packet.getContent(), secretKey);
+            PacketMessage encryptedPacket = new PacketMessage(encryptedContent, packet.getType());
+
+            objectOutputStream.writeObject(encryptedPacket);
+            objectOutputStream.flush();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    // Receive and decrypt a message
-    public String receivePacket() {
+    // Receive and decrypt a PacketMessage
+    public PacketMessage receivePacket() {
         try {
-            String encryptedMessage = reader.readLine();
-            return AESUtil.decrypt(encryptedMessage, secretKey);
+            PacketMessage receivedPacket = (PacketMessage) objectInputStream.readObject();
+
+            // Decrypt content after receiving
+            byte[] decryptedContent = AESUtil.decrypt(receivedPacket.getContent(), secretKey);
+            return new PacketMessage(decryptedContent, receivedPacket.getType());
         } catch (Exception e) {
             e.printStackTrace();
             return null;
